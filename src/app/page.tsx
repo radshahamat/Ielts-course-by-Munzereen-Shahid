@@ -1,10 +1,8 @@
-// app/page.tsx or src/app/page.tsx
-
 import { getData } from "@/libs/data";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import Header from "./header"; 
+import Header from "./header";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -13,7 +11,9 @@ type Props = {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { lang } = await searchParams;
-  const data = await getData(lang as string | undefined);
+  const safeLang = typeof lang === "string" ? lang : "en";
+
+  const data = await getData(safeLang);
 
   return {
     title: data.title,
@@ -22,7 +22,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function Home({ searchParams }: Props) {
   const { lang } = await searchParams;
-  const data = await getData(lang as string | undefined);
+  const safeLang = typeof lang === "string" ? lang : "en";
+
+  const data = await getData(safeLang);
 
   const instructors = data.sections.find((s) => s.type === "instructors")?.values ?? [];
   const layout = data.sections.find((s) => s.type === "features")?.values ?? [];
@@ -34,18 +36,16 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      
-      <Header lang={lang} />
+      <Header lang={safeLang} />
 
-      {/* Left Column */}
       <div className="pt-24 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         <div className="md:col-span-2 space-y-6">
           <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4 rounded-xl shadow">
             <h1 className="font-bold text-3xl mb-2">{data.title}</h1>
-            <p
+            <div
               className="bg-white p-4 rounded-xl shadow text-gray-800 text-justify"
               dangerouslySetInnerHTML={{ __html: data.description }}
-            ></p>
+            />
           </div>
 
           {/* Instructors */}
@@ -56,7 +56,10 @@ export default async function Home({ searchParams }: Props) {
             {instructors.map((inst, i) => (
               <div key={i} className="mb-2">
                 <p className="font-bold text-black">{inst.name}</p>
-                <div className="text-black" dangerouslySetInnerHTML={{ __html: inst.description }} />
+                <div
+                  className="text-black"
+                  dangerouslySetInnerHTML={{ __html: inst.description ?? "" }}
+                />
               </div>
             ))}
           </div>
@@ -111,12 +114,12 @@ export default async function Home({ searchParams }: Props) {
             {details.map((d, i) => (
               <div key={i} className="mb-4">
                 <div
-                  dangerouslySetInnerHTML={{ __html: d.title }}
                   className="text-[#0096DB] font-semibold"
+                  dangerouslySetInnerHTML={{ __html: d.title ?? "" }}
                 />
                 <div
-                  dangerouslySetInnerHTML={{ __html: d.description }}
                   className="text-gray-600 text-justify"
+                  dangerouslySetInnerHTML={{ __html: d.description ?? "" }}
                 />
               </div>
             ))}
@@ -141,7 +144,11 @@ export default async function Home({ searchParams }: Props) {
             )}
           </div>
 
-          <a href="https://app.10minuteschool.com/checkout" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://app.10minuteschool.com/checkout"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <div className="bg-[#0096DB] p-4 text-white text-center font-bold rounded-xl hover:scale-105 transition-transform animate-bounce-slow mb-6">
               {data.cta_text?.name ?? "Enroll Now"}
             </div>
@@ -160,7 +167,6 @@ export default async function Home({ searchParams }: Props) {
                   height={20}
                   className="w-5 h-5"
                 />
-
                 <p className="text-gray-700">{item.text}</p>
               </div>
             ))}
