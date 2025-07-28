@@ -55,7 +55,7 @@ export default async function Home({ searchParams }: Props) {
             </h2>
             {instructors.map((inst, i) => (
               <div key={i} className="mb-2">
-                <p className="font-bold text-black">{inst.name}</p>
+                <p className="font-bold text-[#0096DB] text-xl">{inst.name}</p>
                 <div
                   className="text-black"
                   dangerouslySetInnerHTML={{ __html: inst.description ?? "" }}
