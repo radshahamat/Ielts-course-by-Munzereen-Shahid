@@ -37,3 +37,7 @@ body {
   cursor: pointer;
   animation: bounce-slow 1s ease-in-out infinite;
 }
+html {
+  scroll-padding-top: 64px; 
+  scroll-behavior: smooth; 
+}
